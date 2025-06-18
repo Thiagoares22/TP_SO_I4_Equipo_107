@@ -1,0 +1,112 @@
+A) En la rama TESTING, el color de fondo final es blue, ya que fue el último cambio hecho por BETA en el paso 12.
+
+B) En la rama DESARROLLO, el color de fondo final es yellow, debido al cambio realizado por ALFA en el paso 13.
+
+C) En la rama MASTER, el color de fondo depende del orden de los merges:
+
+Si GAMMA primero hizo merge de DESARROLLO y luego de TESTING (como indica el paso 15 y 16), entonces el fondo quedó en blue (último merge fue desde TESTING).
+
+Si hubiera sido al revés, quedaría yellow.
+
+Como el orden fue primero DESARROLLO y luego TESTING, la respuesta es: blue.
+
+D) El favicon en MASTER es el que haya quedado tras el último merge.
+Dado que BETA también agregó su propio favicon en el paso 5 (aunque no es obligatorio que sea diferente), y el último merge fue desde TESTING, el favicon que quedó en MASTER es el de BETA.
+EyF- Si, todos tuvimos problemas, principalmente a la hora de realizar el merge entre las ramas.
+G) Usar git merge (estrategia predeterminada)
+•	Ventajas:
+o	Preserva el historial completo, incluyendo los merges explícitos medium.com+14atlassian.com+14reddit.com+14.
+o	Ideal para integrar trabajo de distintas personas, manteniendo trazabilidad.
+•	Desventajas:
+o	Puede generar muchos commits de merge ("ruido") y conflictos si hay crecimientos divergentes softwareengineering.stackexchange.comgit-tower.com+13stackoverflow.com+13stackoverflow.com+13.
+•	Consecuencia: Historia completa pero más verbosa. Requiere que todos resuelvan conflictos manualmente cuando aparecen.
+________________________________________
+2.  Usar git rebase
+•	Ventajas:
+o	Produce un historial lineal, facilitando la revisión .
+o	Conflictos surgen uno a uno, siendo más fáciles de resolver.
+•	Desventajas:
+o	Reescribe el historial; puede causar problemas si otros ya basaron trabajo en los commits originales dev.to+11stackoverflow.com+11matthew-b-groves.medium.com+11.
+•	Consecuencia: Historial limpio, pero no usar en ramas compartidas sin coordinación. Requiere git push --force-with-lease si es remoto.
+________________________________________
+3. Usar git cherry-pick
+•	Ventajas:
+o	Trae cambios específicos sin fusionar toda la rama atlassian.com+2softwareengineering.stackexchange.com+2git-tower.com+2stackoverflow.com+5matthew-b-groves.medium.com+5softwareengineering.stackexchange.com+5.
+•	Desventajas:
+o	Duplica commits y pierde el contexto de ramas específicas; puede complicar merges futuros.
+•	Consecuencia: Permite control fino pero puede generar confusión e historia duplicada.
+________________________________________
+4.  git push --force o --force-with-lease
+•	Ventajas:
+o	Utilizado para sobrescribir historial tras rebase o limpieza de commits.
+•	Desventajas:
+o	--force elimina commits remotos; puede borrar trabajo de otros stackoverflow.comatlassian.comatlassian.com.
+o	Incompatibiliza con revisiones abiertas (comentarios perdidos) .
+o	--force-with-lease es más seguro, ya que falla si hay cambios remotos inesperados git-tower.com+2atlassian.com+2softwareengineering.stackexchange.com+2.
+•	Consecuencia: En ramas personales es aceptable; en DESARROLLO o master, puede romper el trabajo de otros.
+________________________________________
+5.  Estrategias avanzadas de merge (-s ours, octopus, subtree)
+•	-s ours: Usa los cambios de la rama actual y descarta los del otro lado atlassian.com+1atlassian.com+1.
+•	octopus: Fusiones múltiples simultáneas; falla si hay conflicto .
+•	Consecuencia:
+o	Útiles en casos especiales (e.g., ignorar cambios de una rama o combinar muchas), pero no recomendados en flujos de trabajo colaborativos estándar.
+________________________________________
+6.  Resolver conflicto manualmente
+•	Muy común en merges. Git marca secciones de conflicto (<<<<<<<) y permite editar antes de continuar.
+•	Consecuencia: Permite integrar lo que cada uno hizo, aunque requiere revisión manual. Es necesario si múltiples cambios divergieron en líneas cercanas softwareengineering.stackexchange.com+8medium.com+8stackoverflow.com+8.
+
+H) ¿Qué sucede si cada uno utiliza git push -f (force push)?
+El uso de git push --force en colaboración tiene serias consecuencias:
+1.	Sobrescribe el historial compartido
+Se reescribe el historial de commits en el repositorio remoto, borrando registros que el resto del equipo ya pudo haber descargado graphite.dev+7stackoverflow.com+7dev.to+7geeksforgeeks.org+3graphite.dev+3labex.io+3.
+2.	Genera desconfianza y caos en sincronización
+Si alguien más ya había descargado el estado anterior, su rama ya no coincide con el remoto. Con el pull, Git no sabe cómo reconciliar y aparecen errores/conflictos complicados .
+3.	Riesgo de pérdida de trabajo
+Si en la rama se removieron commits, al forzar el push esos commits "perdidos" podrían desaparecer definitivamente o reaparecer de manera inesperada en futuros merges .
+4.	Dificulta las revisiones en equipo
+Con force push, las PR o revisiones pierden contexto, aparecen los mismos cambios como nuevos, y se dificulta el seguimiento jvns.ca+1matthew-b-groves.medium.com+1.
+ Conclusión:
+Evita usar --force en ramas compartidas (como DESARROLLO o master). Solo úsalo en tus ramas personales y coordina con el equipo (por ejemplo usando --force-with-lease), o mejor aún, evita completamente el force push en repos externos de equipo jvns.ca.
+________________________________________
+ I) ¿Cómo lograr que index.html contenga todos los <p> de los puntos 18, 19 y 20 en la rama DESARROLLO?
+Supongamos que los puntos 18, 19 y 20 generaron tres párrafos que ahora quieres mostrar como <p> en index.html, y tienes trabajados estos cambios en ramas o commits distintos.
+ Flujo de trabajo recomendado:
+1.	Asegurarte de estar en la rama DESARROLLO:
+bash
+CopiarEditar
+git checkout DESARROLLO
+git pull origin DESARROLLO
+2.	Editar index.html para incluir los <p> correctos
+Abre el archivo y coloca algo así dentro del <body>:
+html
+CopiarEditar
+<h1>Título existente</h1>
+
+<p>Contenido del punto 18...</p>
+<p>Contenido del punto 19...</p>
+<p>Contenido del punto 20...</p>
+3.	Guardar, commitear y enviar:
+bash
+CopiarEditar
+git add index.html
+git commit -m "Agrega <p> de los puntos 18 20 en index.html"
+git pull --rebase origin DESARROLLO   # para asegurarte de que no surgieron cambios remotos
+git push origin DESARROLLO
+ Si los puntos 18 20 ya están en commits de otras ramas (por ejemplo TESTING):
+Podrías traer esos commits a DESARROLLO de estas formas:
+•	Opción A: Merge directo
+bash
+CopiarEditar
+git checkout DESARROLLO
+git pull origin DESARROLLO
+git merge TESTING
+git push origin DESARROLLO
+Esto agrega los commits con los <p> ya preparados.
+•	Opción B: Cherry-pick selectivo
+Si solo hay uno o dos commits relevantes:
+bash
+CopiarEditar
+git checkout DESARROLLO
+git pull origin DESARROLLO
+git cherry-pick <hash18> <hash19> <hash20>
+git push origin DESARROLLO
