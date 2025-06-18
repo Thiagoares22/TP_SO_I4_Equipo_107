@@ -10,6 +10,9 @@
   <h1>Controlde versiones</h1>
   <h2>BETA Lorenzo Braunstein <h2>
   <h3>ALFA Lucas Aristondo </h3>
+  <p>Aristondo Lucas 18/06 </p>
+  <p>Braunstein Lorenzo 18/06 </p>
+  <p>Ares Thiago 18/06 </p>
 </body>
 </html>
 
